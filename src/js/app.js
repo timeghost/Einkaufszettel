@@ -1,9 +1,10 @@
 (function () {
+
     "use strict";
+    var path_db = "db/index.php";
 
     var Einkaufsliste = angular.module( "Einkaufsliste", ['ngRoute', 'ngAnimate'] );
-
-    var path_db = "db/index.php";
+    
 
     Einkaufsliste
         .config( [
@@ -26,6 +27,7 @@
             }
         ] )
         .controller( 'EinkaufslisteController', function () {
+
         } )
         .controller( 'ListController', function ( $http, $location ) {
 
@@ -127,7 +129,27 @@
              * @param _entry
              */
             this.toggleEntryDelete = function ( _entry ) {
+                
                 _entry.delete = _entry.delete ? false : true;
+                _entry.check = _entry.check ? false : true;
+                
+                var _check = {'check': []};
+                
+                 _check.check.push( _entry.id );
+
+                 $http
+                        .post( path_db + "/check", _check )
+                        .success( function ( data ) {
+                            list.isOffline = false;
+
+                            if ( data.status === "ok" ) 
+                            {
+                            }
+                        } )
+                        .error( function () {
+                            list.isOffline = true;
+                        } );
+
             };
 
             this.loadList();
@@ -140,4 +162,43 @@
             };
 
         } )
+        .controller('serverSideEvents', function ($scope,$http) {
+
+                $scope.updating = false;
+
+                if (typeof(EventSource) !== "undefined") 
+                {
+                    // Yes! Server-sent events support!
+                    var source = new EventSource( path_db + '/stream');
+                    
+
+                    source.onmessage = function (event) 
+                    {
+                        var data = JSON.parse(event.data);
+                        for (var i = 0, len = data.length; i < len; ++i) 
+                        {
+                            var student = data[i];
+                            var myEl = angular.element( document.querySelector( '#einkaufsliste-item-'+student.id ) );
+                            var myEl2 = angular.element( document.querySelector( '#einkaufsliste-item-name-'+student.id ) );
+                            myEl.addClass('disabled');
+                            myEl.addClass('strike');
+                        }
+                        console.log(data);
+                    };
+                }
+                else 
+                {
+                    // Sorry! No server-sent events support..
+                    alert('SSE not supported by browser.');
+                }
+
+            $scope.update = function () {
+                $scope.updateTime = Date.now();
+                $scope.updating = true;
+            }
+
+            $scope.reset = function () {
+                $scope.updating = false;
+            }
+        })
 })();

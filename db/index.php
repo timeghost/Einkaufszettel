@@ -15,15 +15,23 @@ $app = new \Slim\Slim();
  */
 $app->get('/list', function () use ($app) {
 
-		$entries = R::findAll('entry');
+		$entries = R::findAll('entry', ' ORDER BY name ASC');
 
 		$rows = array();
-		foreach ($entries as $entry) {
+		foreach ($entries as $entry) 
+		{
 			$rows[] = array(
 				'id' => $entry->id,
 				'name' => $entry->name,
-				'amount' => $entry->amount
+				'amount' => $entry->amount,
+				'hash' => $entry->hash,
+				'delete' => $entry->check,
+				'check' => $entry->check
 			);
+
+
+			if ( $rows[sizeof($rows)-1]['delete'] == 0)
+				unset( $rows[sizeof($rows)-1]['delete']);
 		}
 
 		$app->response->headers->set('Content-Type', 'application/json');
@@ -80,6 +88,75 @@ $app->post('/delete', function () use ($app) {
 
 		$app->response->headers->set('Content-Type', 'application/json');
 		$app->response->setBody(json_encode($response));
+	}
+);
+
+$app->post('/check', function () use ($app) {
+
+		$json = json_decode($app->request->getBody(), TRUE);
+		$todelete = $json['check'];
+		$response = array("status" => "ok");
+
+		$entries = R::loadAll('entry', $json['check'] );
+
+		if ($entries) 
+		{
+			try 
+			{
+				foreach ($entries as $entry) 
+				{
+					if ( !$entry->check )
+						$entry->check = true;
+					else
+						$entry->check = !$entry->check;
+
+					R::store( $entry );
+				}
+				
+			}
+			catch (Exception $e) 
+			{
+				$response["status"] = "fail";
+			}
+		}
+		
+		$app->response->headers->set('Content-Type', 'application/json');
+		$app->response->setBody(json_encode($response));
+	}
+);
+
+	$app->get('/stream', function () use ($app) 
+	{
+		$app->response->headers->set('Content-Type', 'text/event-stream');
+
+		$response = array("status" => "error");
+	
+		$checked=true;
+
+		$entries = R::find('entry');
+
+		$rows = array();
+		foreach ($entries as $entry) 
+		{
+			if ( $entry->check==0 || $entry->check == null)
+				continue;
+
+			$rows[] = array(
+				'id' => $entry->id,
+				'name' => $entry->name,
+				'amount' => $entry->amount,
+				'hash' => $entry->hash,
+				'check' => $entry->check
+			);
+		}
+		
+		if ( sizeof($rows) > 0 )
+		{
+			$app->response->setBody
+			(
+				'data: ' . json_encode($rows). "\n\n"
+			);	
+		}
 	}
 );
 $app->run();

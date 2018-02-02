@@ -33,6 +33,8 @@
             text-decoration: line-through;
         }
     </style>
+
+  
 </head>
 <body ng-app="Einkaufsliste">
 
@@ -40,12 +42,11 @@
 <!--suppress HtmlUnknownAttribute -->
 <ng-include src="'src/views/navigation.tpl.html'"></ng-include>
 <div class="container" ng-controller="EinkaufslisteController as Einkaufsliste">
-
-
     <div ng-controller="ListController as list">
         <div ng-view></div>
     </div>
-
+</div>
+<div ng-controller="serverSideEvents">
 </div>
 
 <footer class="einkaufsliste-footer">

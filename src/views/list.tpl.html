@@ -1,3 +1,31 @@
+<form class="form" name="newEntryForm" ng-submit="newEntryForm.$valid && list.addListEntry()" novalidate>
+    <div class="row">
+        <div class="col-xs-12 col-md-6">
+
+            <div class="form-group">
+                <label for="name">Produkt</label>
+                <input type="text" class="form-control" id="name" name="name" placeholder="Was soll eingekauft werden?" ng-model="list.newEntry.name" required autofocus>
+            </div>
+
+        </div>
+
+        <div class="col-xs-12 col-md-3">
+            <div class="form-group">
+                <label for="amount">Anzahl</label>
+                <input ng-model="list.newEntry.amount" type="number" value="1" class="form-control" id="amount" name="amount"
+                       required autocomplete="off" >
+            </div>
+        </div>
+        
+        <div class="col-xs-12 col-md-3">
+            <div class="form-group">
+                <button class="btn btn-success">Hinzufügen</button>
+            </div>
+        </div>
+    
+    </div>
+</form>
+
 <form name="listForm" ng-submit="list.deleteEntries()">
 
     <div class="row">
@@ -5,16 +33,14 @@
 
             <ul class="list-group" ng-show="list.Entries.length">
 
-                <li class="list-group-item einkaufsliste-item" ng-repeat="entry in list.Entries"
-                    ng-class="{disabled :entry.delete }" ng-click="list.toggleEntryDelete(entry)">
+                <li id="einkaufsliste-item-{{entry.id}}" class="list-group-item einkaufsliste-item" ng-repeat="entry in list.Entries" ng-class="{disabled :entry.delete }" ng-click="list.toggleEntryDelete(entry)">
 
                     <span class="badge">{{entry.amount}}</span>
 
-                    <input hidden="hidden" name="entry.delete" ng-model="entry.delete"
-                           value="{{entry.id}}"/>
+                    <input hidden="hidden" name="entry.delete" ng-model="entry.delete" value="{{entry.id}}"/>
                     <span class="glyphicon glyphicon-ok" ng-show="entry.delete"></span>
                     <span class="glyphicon glyphicon-ok-circle" ng-hide="entry.delete"></span>
-                    <span ng-class="{strike: entry.delete}">{{entry.name}}</span>
+                    <span id="einkaufsliste-item-name-{{entry.id}}"ng-class="{strike: entry.delete}">{{entry.name}}</span>
 
                 </li>
             </ul>
