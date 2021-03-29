@@ -15,7 +15,7 @@ $app = new \Slim\Slim();
  */
 $app->get('/list', function () use ($app) {
 
-		$entries = R::findAll('entry', ' ORDER BY name ASC');
+		$entries = R::findAll('entry', '');
 
 		$rows = array();
 		foreach ($entries as $entry) 
