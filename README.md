@@ -1,4 +1,4 @@
-# Einkaufsliste
+# Einkaufszettel
 
 Dieses kleine Tool löst das "Ewige-Einkaufsliste-für-mehr-Personen-Problem". Kein Whatsapp, E-Mail und Co., keine Medienbrüche und keine oversized Google Docs-Lösungen mit Overhead, scheiss-Bedienung und fremdem Cloud-Zeugs.
 
